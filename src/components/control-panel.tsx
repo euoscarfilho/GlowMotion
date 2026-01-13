@@ -106,8 +106,8 @@ export default function ControlPanel({
                 <Label htmlFor="brightness" className="text-sm font-medium">Brilho</Label>
                 <Slider
                   id="brightness"
-                  min={0.2}
-                  max={1.5}
+                  min={0.5}
+                  max={1.2}
                   step={0.05}
                   value={[brightness]}
                   onValueChange={(value) => setBrightness(value[0])}
