@@ -5,21 +5,25 @@ import LedGrid from './led-grid';
 import ControlPanel from './control-panel';
 import { patterns, type PatternFunction } from '@/lib/patterns';
 
-const GRID_COLS = 128;
-const GRID_ROWS = 96;
+const HIGH_RES_COLS = 128;
+const HIGH_RES_ROWS = 96;
+const LOW_RES_COLS = 64;
+const LOW_RES_ROWS = 48;
 
-const createInitialGrid = (): string[][] => {
-  return Array(GRID_ROWS).fill(Array(GRID_COLS).fill('#000000'));
+const createInitialGrid = (rows: number, cols: number): string[][] => {
+  return Array(rows).fill(Array(cols).fill('#000000'));
 };
 
 export default function GlowMotionApp() {
   const [isClient, setIsClient] = useState(false);
-  const [gridData, setGridData] = useState<string[][]>(createInitialGrid);
+  const [gridCols, setGridCols] = useState(HIGH_RES_COLS);
+  const [gridRows, setGridRows] = useState(HIGH_RES_ROWS);
+  const [gridData, setGridData] = useState<string[][]>(() => createInitialGrid(HIGH_RES_ROWS, HIGH_RES_COLS));
   const [colors, setColors] = useState<string[]>([
     '#0000FF', '#FF0000', '#FFFF00', '#FF69B4', '#00FF00', '#FFFFFF'
   ]);
   const [speed, setSpeed] = useState<number>(20);
-  const [selectedPattern, setSelectedPattern] = useState<string>(patterns[0].id);
+  const [selectedPattern, setSelectedPattern] = useState<string>('solid-color');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [brightness, setBrightness] = useState(1);
   const [isAnimationEnabled, setIsAnimationEnabled] = useState(true);
@@ -27,7 +31,7 @@ export default function GlowMotionApp() {
   const animationFrameId = useRef<number>();
   const appContainerRef = useRef<HTMLDivElement>(null);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
-  const patternFuncRef = useRef<PatternFunction>(patterns[0].func);
+  const patternFuncRef = useRef<PatternFunction>(patterns.find(p => p.id === 'solid-color')!.func);
   const timeRef = useRef(0);
   const initialColorsRef = useRef([...colors]);
 
@@ -41,6 +45,12 @@ export default function GlowMotionApp() {
       patternFuncRef.current = newPattern.func;
       if (newPattern.id === 'solid-color') {
         setIsAnimationEnabled(false);
+        setGridCols(HIGH_RES_COLS);
+        setGridRows(HIGH_RES_ROWS);
+      } else {
+        setIsAnimationEnabled(true);
+        setGridCols(LOW_RES_COLS);
+        setGridRows(LOW_RES_ROWS);
       }
     }
   }, [selectedPattern]);
@@ -49,15 +59,15 @@ export default function GlowMotionApp() {
     if (isAnimationEnabled) {
       timeRef.current = timestamp;
       const t = timestamp * (speed / 1000);
-      const newGridData = Array.from({ length: GRID_ROWS }, (_, i) =>
-        Array.from({ length: GRID_COLS }, (_, j) =>
-          patternFuncRef.current(j, i, t, GRID_COLS, GRID_ROWS, colors)
+      const newGridData = Array.from({ length: gridRows }, (_, i) =>
+        Array.from({ length: gridCols }, (_, j) =>
+          patternFuncRef.current(j, i, t, gridCols, gridRows, colors)
         )
       );
       setGridData(newGridData);
     }
     animationFrameId.current = requestAnimationFrame(animate);
-  }, [speed, colors, isAnimationEnabled]);
+  }, [speed, colors, isAnimationEnabled, gridCols, gridRows]);
 
   useEffect(() => {
     if (isAnimationEnabled) {
@@ -66,24 +76,14 @@ export default function GlowMotionApp() {
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
       }
-      // When pausing, render one last static frame if not solid-color
-      if (selectedPattern !== 'solid-color') {
-        const t = timeRef.current * (speed / 1000);
-        const newGridData = Array.from({ length: GRID_ROWS }, (_, i) =>
-          Array.from({ length: GRID_COLS }, (_, j) =>
-            patternFuncRef.current(j, i, t, GRID_COLS, GRID_ROWS, colors)
-          )
-        );
-        setGridData(newGridData);
-      } else {
-        // For solid color, just show the solid color
-        const newGridData = Array.from({ length: GRID_ROWS }, (_, i) =>
-          Array.from({ length: GRID_COLS }, (_, j) =>
-            patternFuncRef.current(j, i, 0, GRID_COLS, GRID_ROWS, colors)
-          )
-        );
-        setGridData(newGridData);
-      }
+      // When pausing or for solid color, render a static frame
+      const t = timeRef.current * (speed / 1000);
+      const newGridData = Array.from({ length: gridRows }, (_, i) =>
+        Array.from({ length: gridCols }, (_, j) =>
+          patternFuncRef.current(j, i, t, gridCols, gridRows, colors)
+        )
+      );
+      setGridData(newGridData);
     }
 
     return () => {
@@ -91,7 +91,7 @@ export default function GlowMotionApp() {
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [animate, isAnimationEnabled, speed, colors, selectedPattern]);
+  }, [animate, isAnimationEnabled, speed, colors, selectedPattern, gridCols, gridRows]);
 
   const handleFullscreenChange = () => {
     if (!document.fullscreenElement) {
