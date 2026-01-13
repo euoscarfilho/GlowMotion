@@ -4,6 +4,8 @@ import {
   Maximize,
   Minimize,
   Palette,
+  Pause,
+  Play,
   Settings2,
   SlidersHorizontal,
   Sun,
@@ -33,6 +35,8 @@ type ControlPanelProps = {
   toggleFullscreen: () => void;
   brightness: number;
   setBrightness: (brightness: number) => void;
+  isAnimationEnabled: boolean;
+  setIsAnimationEnabled: (enabled: boolean) => void;
 };
 
 export default function ControlPanel({
@@ -46,6 +50,8 @@ export default function ControlPanel({
   toggleFullscreen,
   brightness,
   setBrightness,
+  isAnimationEnabled,
+  setIsAnimationEnabled,
 }: ControlPanelProps) {
   const handleColorChange = (index: number, newColor: string) => {
     const newColors = [...colors];
@@ -76,7 +82,7 @@ export default function ControlPanel({
         {/* Speed Slider Popover */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="icon" className="flex-shrink-0">
+            <Button variant="outline" size="icon" className="flex-shrink-0" disabled={!isAnimationEnabled}>
               <SlidersHorizontal className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
@@ -158,6 +164,23 @@ export default function ControlPanel({
             </div>
           </PopoverContent>
         </Popover>
+
+        {/* Animation Toggle */}
+        <Button
+          onClick={() => setIsAnimationEnabled(!isAnimationEnabled)}
+          variant="outline"
+          size="icon"
+          className="flex-shrink-0"
+        >
+          {isAnimationEnabled ? (
+            <Pause className="h-4 w-4" />
+          ) : (
+            <Play className="h-4 w-4" />
+          )}
+          <span className="sr-only">
+            {isAnimationEnabled ? 'Pause Animation' : 'Play Animation'}
+          </span>
+        </Button>
 
         {/* Fullscreen Toggle */}
         <Button
