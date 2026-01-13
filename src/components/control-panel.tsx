@@ -37,6 +37,7 @@ type ControlPanelProps = {
   setBrightness: (brightness: number) => void;
   isAnimationEnabled: boolean;
   setIsAnimationEnabled: (enabled: boolean) => void;
+  popoverContainer?: HTMLElement;
 };
 
 export default function ControlPanel({
@@ -52,6 +53,7 @@ export default function ControlPanel({
   setBrightness,
   isAnimationEnabled,
   setIsAnimationEnabled,
+  popoverContainer,
 }: ControlPanelProps) {
   const handleColorChange = (index: number, newColor: string) => {
     const newColors = [...colors];
@@ -86,7 +88,7 @@ export default function ControlPanel({
               <SlidersHorizontal className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-56">
+          <PopoverContent className="w-56" container={popoverContainer}>
             <div className="space-y-4">
               <div>
                 <Label htmlFor="speed" className="text-sm font-medium">Velocidade</Label>
@@ -125,7 +127,7 @@ export default function ControlPanel({
               <Palette className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto">
+          <PopoverContent className="w-auto" container={popoverContainer}>
             <div className="space-y-4">
               <Label className="text-sm font-medium">{isSolidColorMode ? 'Cor' : 'Paleta de Cores'}</Label>
               <div className="flex items-center gap-2">

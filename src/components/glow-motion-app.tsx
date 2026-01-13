@@ -170,6 +170,7 @@ export default function GlowMotionApp() {
         setBrightness={setBrightness}
         isAnimationEnabled={isAnimationEnabled}
         setIsAnimationEnabled={setIsAnimationEnabled}
+        popoverContainer={appContainerRef.current ?? undefined}
       />
     </div>
   );

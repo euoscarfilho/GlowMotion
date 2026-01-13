@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 export const metadata: Metadata = {
   title: 'GlowMotion',
   description: 'Dynamic LED light shows on your screen',
+  manifest: '/manifest.webmanifest',
 };
 
 export default function RootLayout({
