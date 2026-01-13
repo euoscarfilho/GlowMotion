@@ -109,12 +109,22 @@ export default function GlowMotionApp() {
   
   const handleScreenTap = () => {
     if (selectedPattern === 'solid-color') {
-      const remainingColors = colors.slice(1);
-      if (remainingColors.length > 0) {
-        const randomColor = remainingColors[Math.floor(Math.random() * remainingColors.length)];
-        // Keep the rest of the palette, just change the active solid color
-        setColors([randomColor, ...colors.slice(1)]);
-      }
+      setColors(prevColors => {
+        if (prevColors.length <= 1) return prevColors;
+        
+        const currentColor = prevColors[0];
+        const currentIndex = prevColors.indexOf(currentColor);
+        const nextIndex = (currentIndex + 1) % prevColors.length;
+        const nextColor = prevColors[nextIndex];
+        
+        // Reorder the array to make the next color the first one,
+        // while preserving the rest of the order for consistency.
+        const reorderedColors = [...prevColors];
+        reorderedColors.splice(nextIndex, 1);
+        reorderedColors.unshift(nextColor);
+        
+        return reorderedColors;
+      });
     }
   };
 
