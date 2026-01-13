@@ -1,7 +1,7 @@
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
-import { useEffect, useState } from 'react';
+import { useFormStatus } from 'react-dom';
+import { useActionState, useEffect, useState } from 'react';
 import { suggestPaletteAction } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import {
@@ -33,7 +33,7 @@ function SubmitButton() {
 
 export function AiPaletteSuggester({ onPaletteSuggested }: AiPaletteSuggesterProps) {
   const initialState = { message: '', colors: [], error: '' };
-  const [state, dispatch] = useFormState(suggestPaletteAction, initialState);
+  const [state, dispatch] = useActionState(suggestPaletteAction, initialState);
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
 
