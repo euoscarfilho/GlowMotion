@@ -77,7 +77,8 @@ export default function GlowMotionApp() {
           wakeLockRef.current = await navigator.wakeLock.request('screen');
         }
       } catch (err) {
-        console.error(`Could not acquire wake lock: ${err}`);
+        // Silently fail if wake lock is not available.
+        // This is not a critical feature.
       }
     } else {
       await document.exitFullscreen();
