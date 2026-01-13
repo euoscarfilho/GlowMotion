@@ -107,7 +107,14 @@ const gradient: PatternFunction = (x, y, t, cols, rows, colors) => {
 };
 
 const solidColor: PatternFunction = (x, y, t, cols, rows, colors) => {
-    return colors[0] || '#000000';
+  const baseColor = colors[0] || '#000000';
+  const pulse = (Math.sin(t * 2) + 1) / 2; // oscillates between 0 and 1
+  const pulseFactor = 0.8 + pulse * 0.2; // pulse between 80% and 100% brightness
+
+  const rgb = hexToRgb(baseColor);
+  const finalColor = rgbToHex(rgb[0] * pulseFactor, rgb[1] * pulseFactor, rgb[2] * pulseFactor);
+
+  return finalColor;
 };
 
 const christmasBlinkRandom: PatternFunction = (x, y, t, cols, rows, colors) => {

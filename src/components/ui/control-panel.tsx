@@ -154,7 +154,7 @@ export default function ControlPanel({
                   </>
                 )}
               </div>
-              <AiPaletteSuggester onPaletteSuggested={setColors} />
+              {!isSolidColorMode && <AiPaletteSuggester onPaletteSuggested={setColors} />}
             </div>
           </PopoverContent>
         </Popover>

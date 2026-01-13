@@ -16,11 +16,12 @@ export default function GlowMotionApp() {
   const [isClient, setIsClient] = useState(false);
   const [gridData, setGridData] = useState<string[][]>(createInitialGrid);
   const [colors, setColors] = useState<string[]>([
-    '#7DF9FF', '#7FFFD4', '#FF7F50', '#FF00FF', '#FFFF00', '#00FFFF'
+    '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'
   ]);
   const [speed, setSpeed] = useState<number>(20);
   const [selectedPattern, setSelectedPattern] = useState<string>(patterns[0].id);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [brightness, setBrightness] = useState(1);
 
   const animationFrameId = useRef<number>();
   const appContainerRef = useRef<HTMLDivElement>(null);
@@ -85,6 +86,17 @@ export default function GlowMotionApp() {
       setIsFullscreen(false);
     }
   };
+  
+  const handleScreenTap = () => {
+    if (selectedPattern === 'solid-color') {
+      const remainingColors = colors.slice(1);
+      if (remainingColors.length > 0) {
+        const randomColor = remainingColors[Math.floor(Math.random() * remainingColors.length)];
+        // Keep the rest of the palette, just change the active solid color
+        setColors([randomColor, ...colors.slice(1)]);
+      }
+    }
+  };
 
   useEffect(() => {
     document.addEventListener('fullscreenchange', handleFullscreenChange);
@@ -99,8 +111,8 @@ export default function GlowMotionApp() {
   }
 
   return (
-    <div ref={appContainerRef} className="h-screen w-screen bg-background">
-      <LedGrid gridData={gridData} />
+    <div ref={appContainerRef} className="h-screen w-screen bg-background" onClick={handleScreenTap}>
+      <LedGrid gridData={gridData} style={{ opacity: brightness }}/>
       <ControlPanel
         colors={colors}
         setColors={setColors}
@@ -110,6 +122,8 @@ export default function GlowMotionApp() {
         setSelectedPattern={setSelectedPattern}
         isFullscreen={isFullscreen}
         toggleFullscreen={toggleFullscreen}
+        brightness={brightness}
+        setBrightness={setBrightness}
       />
     </div>
   );
