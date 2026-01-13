@@ -5,8 +5,8 @@ import LedGrid from './led-grid';
 import ControlPanel from './control-panel';
 import { patterns, type PatternFunction } from '@/lib/patterns';
 
-const GRID_COLS = 24;
-const GRID_ROWS = 32;
+const GRID_COLS = 48;
+const GRID_ROWS = 64;
 
 const createInitialGrid = (): string[][] => {
   return Array(GRID_ROWS).fill(Array(GRID_COLS).fill('#000000'));
@@ -29,6 +29,7 @@ export default function GlowMotionApp() {
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
   const patternFuncRef = useRef<PatternFunction>(patterns[0].func);
   const timeRef = useRef(0);
+  const initialColorsRef = useRef([...colors]);
 
   useEffect(() => {
     setIsClient(true);
@@ -110,22 +111,14 @@ export default function GlowMotionApp() {
   const handleScreenTap = () => {
     if (selectedPattern === 'solid-color') {
       setColors(prevColors => {
-        // Find the index of the current first color in the original array.
         const currentFirstColor = prevColors[0];
-        let currentIndex = colors.indexOf(currentFirstColor);
+        let currentIndex = initialColorsRef.current.indexOf(currentFirstColor);
         if (currentIndex === -1) {
-          // Fallback if the color isn't in the main list, start from beginning
           currentIndex = 0; 
         }
-  
-        // Determine the next index, wrapping around if necessary.
-        const nextIndex = (currentIndex + 1) % colors.length;
-        const nextColor = colors[nextIndex];
-  
-        // Create a new array with the next color at the front.
-        // The rest of the colors can be the original array for simplicity,
-        // as solid-color mode only uses the first one.
-        return [nextColor, ...colors.filter(c => c !== nextColor)];
+        const nextIndex = (currentIndex + 1) % initialColorsRef.current.length;
+        const nextColor = initialColorsRef.current[nextIndex];
+        return [nextColor, ...initialColorsRef.current.filter(c => c !== nextColor)];
       });
     }
   };

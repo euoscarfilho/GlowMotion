@@ -78,20 +78,27 @@ const plasma: PatternFunction = (x, y, t, cols, rows, colors) => {
 };
 
 const sparkle: PatternFunction = (x, y, t, cols, rows, colors) => {
-    // A pseudo-random but deterministic function of x, y, and t
-    const timeSegment = Math.floor(t * 2); // Change sparkle every 0.5s
-    const randomSeed = (x * 13 + y * 29 + timeSegment * 41) % 100 / 100;
-    
-    if (randomSeed > 0.98) { // 2% chance to sparkle
-        const colorIndex = Math.floor(Math.random() * colors.length);
-        return colors[colorIndex] || '#000000';
+    // A pseudo-random but deterministic function of x, y, and time
+    const timeSegment = Math.floor(t * 3); // Change sparkle rate
+    let hash = 0;
+    const str = `${x},${y},${timeSegment}`;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    const randomSeed = (hash & 0x7FFFFFFF) / 0x7FFFFFFF;
+
+    if (randomSeed > 0.985) { // 1.5% chance to sparkle
+        const colorIndex = Math.floor(randomSeed * colors.length * 50) % colors.length;
+        return colors[colorIndex] || '#FFFFFF';
     }
     return '#000000';
 };
 
 const gradient: PatternFunction = (x, y, t, cols, rows, colors) => {
-    const progress = (x / (cols -1) + Math.sin(t / 2)) % 1;
-    const colorStops = colors.length -1;
+    const progress = (x / cols + t * 0.1) % 1;
+    const colorStops = colors.length - 1;
     const startIndex = Math.floor(progress * colorStops);
     const endIndex = Math.min(startIndex + 1, colorStops);
     const localProgress = (progress * colorStops) - startIndex;
@@ -107,14 +114,7 @@ const gradient: PatternFunction = (x, y, t, cols, rows, colors) => {
 };
 
 const solidColor: PatternFunction = (x, y, t, cols, rows, colors) => {
-  const baseColor = colors[0] || '#000000';
-  const pulse = (Math.sin(t * 2) + 1) / 2; // oscillates between 0 and 1
-  const pulseFactor = 0.8 + pulse * 0.2; // pulse between 80% and 100% brightness
-
-  const rgb = hexToRgb(baseColor);
-  const finalColor = rgbToHex(rgb[0] * pulseFactor, rgb[1] * pulseFactor, rgb[2] * pulseFactor);
-
-  return finalColor;
+  return colors[0] || '#000000';
 };
 
 const christmasBlinkRandom: PatternFunction = (x, y, t, cols, rows, colors) => {
