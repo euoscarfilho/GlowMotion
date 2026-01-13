@@ -16,7 +16,7 @@ export default function GlowMotionApp() {
   const [isClient, setIsClient] = useState(false);
   const [gridData, setGridData] = useState<string[][]>(createInitialGrid);
   const [colors, setColors] = useState<string[]>([
-    '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'
+    '#0000FF', '#FF0000', '#FFFF00', '#FF69B4', '#00FF00', '#FFFFFF'
   ]);
   const [speed, setSpeed] = useState<number>(20);
   const [selectedPattern, setSelectedPattern] = useState<string>(patterns[0].id);
@@ -98,7 +98,7 @@ export default function GlowMotionApp() {
           wakeLockRef.current = await navigator.wakeLock.request('screen');
         }
       } catch (err) {
-        // Silently fail if wake lock is not available.
+        // Silently fail if wake lock is not available or permission is denied.
         // This is not a critical feature.
       }
     } else {
@@ -110,23 +110,26 @@ export default function GlowMotionApp() {
   const handleScreenTap = () => {
     if (selectedPattern === 'solid-color') {
       setColors(prevColors => {
-        if (prevColors.length <= 1) return prevColors;
-        
-        const currentColor = prevColors[0];
-        const currentIndex = prevColors.indexOf(currentColor);
-        const nextIndex = (currentIndex + 1) % prevColors.length;
-        const nextColor = prevColors[nextIndex];
-        
-        // Reorder the array to make the next color the first one,
-        // while preserving the rest of the order for consistency.
-        const reorderedColors = [...prevColors];
-        reorderedColors.splice(nextIndex, 1);
-        reorderedColors.unshift(nextColor);
-        
-        return reorderedColors;
+        // Find the index of the current first color in the original array.
+        const currentFirstColor = prevColors[0];
+        let currentIndex = colors.indexOf(currentFirstColor);
+        if (currentIndex === -1) {
+          // Fallback if the color isn't in the main list, start from beginning
+          currentIndex = 0; 
+        }
+  
+        // Determine the next index, wrapping around if necessary.
+        const nextIndex = (currentIndex + 1) % colors.length;
+        const nextColor = colors[nextIndex];
+  
+        // Create a new array with the next color at the front.
+        // The rest of the colors can be the original array for simplicity,
+        // as solid-color mode only uses the first one.
+        return [nextColor, ...colors.filter(c => c !== nextColor)];
       });
     }
   };
+
 
   useEffect(() => {
     document.addEventListener('fullscreenchange', handleFullscreenChange);

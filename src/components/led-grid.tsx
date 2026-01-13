@@ -22,7 +22,7 @@ const LedGrid = memo(function LedGrid({ gridData, style }: LedGridProps) {
         row.map((color, j) => (
           <div
             key={`${i}-${j}`}
-            className="transition-colors duration-100"
+            className="transition-colors duration-200"
             style={{ backgroundColor: color, willChange: 'background-color' }}
             aria-hidden="true"
           />
