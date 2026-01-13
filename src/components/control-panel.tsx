@@ -23,6 +23,7 @@ import { patterns } from '@/lib/patterns';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Label } from './ui/label';
 import { AiPaletteSuggester } from './ai-palette-suggester';
+import { Separator } from './ui/separator';
 
 type ControlPanelProps = {
   colors: string[];
@@ -79,46 +80,41 @@ export default function ControlPanel({
           </SelectContent>
         </Select>
 
-        {/* Speed Slider Popover */}
+        {/* Adjustments Popover (Speed & Brightness) */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="icon" className="flex-shrink-0" disabled={!isAnimationEnabled}>
+            <Button variant="outline" size="icon" className="flex-shrink-0">
               <SlidersHorizontal className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-56">
             <div className="space-y-4">
-              <Label htmlFor="speed" className="text-sm font-medium">Animation Speed</Label>
-              <Slider
-                id="speed"
-                min={1}
-                max={100}
-                step={1}
-                value={[speed]}
-                onValueChange={(value) => setSpeed(value[0])}
-              />
-            </div>
-          </PopoverContent>
-        </Popover>
-        
-        {/* Brightness Popover */}
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button variant="outline" size="icon" className="flex-shrink-0">
-              <Sun className="h-4 w-4" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-56">
-            <div className="space-y-4">
-              <Label htmlFor="brightness" className="text-sm font-medium">Brightness</Label>
-              <Slider
-                id="brightness"
-                min={0}
-                max={1}
-                step={0.05}
-                value={[brightness]}
-                onValueChange={(value) => setBrightness(value[0])}
-              />
+              <div>
+                <Label htmlFor="speed" className="text-sm font-medium">Velocidade</Label>
+                <Slider
+                  id="speed"
+                  min={1}
+                  max={100}
+                  step={1}
+                  value={[speed]}
+                  onValueChange={(value) => setSpeed(value[0])}
+                  disabled={!isAnimationEnabled}
+                  className="mt-2"
+                />
+              </div>
+              <Separator />
+              <div>
+                <Label htmlFor="brightness" className="text-sm font-medium">Brilho</Label>
+                <Slider
+                  id="brightness"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={[brightness]}
+                  onValueChange={(value) => setBrightness(value[0])}
+                  className="mt-2"
+                />
+              </div>
             </div>
           </PopoverContent>
         </Popover>
@@ -132,7 +128,7 @@ export default function ControlPanel({
           </PopoverTrigger>
           <PopoverContent className="w-auto">
             <div className="space-y-4">
-              <Label className="text-sm font-medium">{isSolidColorMode ? 'Escolha a Cor' : 'Paleta de Cores'}</Label>
+              <Label className="text-sm font-medium">{isSolidColorMode ? 'Cor' : 'Paleta de Cores'}</Label>
               <div className="flex items-center gap-2">
                 {isSolidColorMode ? (
                   <div className="relative h-8 w-8">
@@ -160,7 +156,7 @@ export default function ControlPanel({
                   </>
                 )}
               </div>
-              <AiPaletteSuggester onPaletteSuggested={setColors} />
+              {!isSolidColorMode && <AiPaletteSuggester onPaletteSuggested={setColors} />}
             </div>
           </PopoverContent>
         </Popover>
