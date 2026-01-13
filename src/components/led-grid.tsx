@@ -10,7 +10,7 @@ type LedGridProps = {
 const LedGrid = memo(function LedGrid({ gridData, style }: LedGridProps) {
   return (
     <div
-      className="absolute inset-0 grid h-full w-full transition-opacity duration-200"
+      className="absolute inset-0 grid h-full w-full"
       style={{
         ...style,
         gridTemplateColumns: `repeat(${gridData[0]?.length || 1}, 1fr)`,
@@ -22,7 +22,6 @@ const LedGrid = memo(function LedGrid({ gridData, style }: LedGridProps) {
         row.map((color, j) => (
           <div
             key={`${i}-${j}`}
-            className="transition-colors duration-100"
             style={{ backgroundColor: color, willChange: 'background-color' }}
             aria-hidden="true"
           />
