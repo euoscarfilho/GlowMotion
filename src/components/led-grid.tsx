@@ -15,7 +15,6 @@ const LedGrid = memo(function LedGrid({ gridData, style }: LedGridProps) {
         ...style,
         gridTemplateColumns: `repeat(${gridData[0]?.length || 1}, 1fr)`,
         gridTemplateRows: `repeat(${gridData.length || 1}, 1fr)`,
-        gap: '1px',
       }}
     >
       {gridData.map((row, i) =>

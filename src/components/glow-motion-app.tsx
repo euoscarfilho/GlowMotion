@@ -39,6 +39,10 @@ export default function GlowMotionApp() {
     const newPattern = patterns.find((p) => p.id === selectedPattern);
     if (newPattern) {
       patternFuncRef.current = newPattern.func;
+      // When changing to solid-color, pause animation
+      if (newPattern.id === 'solid-color') {
+        setIsAnimationEnabled(false);
+      }
     }
   }, [selectedPattern]);
 
@@ -108,7 +112,12 @@ export default function GlowMotionApp() {
     }
   };
   
-  const handleScreenTap = () => {
+  const handleScreenTap = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Prevent color change if the click is on the control panel
+    if ((e.target as HTMLElement).closest('.fixed.bottom-0')) {
+      return;
+    }
+    
     if (selectedPattern === 'solid-color') {
       setColors(prevColors => {
         const currentFirstColor = prevColors[0];
