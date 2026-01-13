@@ -5,8 +5,8 @@ import LedGrid from './led-grid';
 import ControlPanel from './control-panel';
 import { patterns, type PatternFunction } from '@/lib/patterns';
 
-const GRID_COLS = 48;
-const GRID_ROWS = 64;
+const GRID_COLS = 96;
+const GRID_ROWS = 128;
 
 const createInitialGrid = (): string[][] => {
   return Array(GRID_ROWS).fill(Array(GRID_COLS).fill('#000000'));
@@ -39,7 +39,6 @@ export default function GlowMotionApp() {
     const newPattern = patterns.find((p) => p.id === selectedPattern);
     if (newPattern) {
       patternFuncRef.current = newPattern.func;
-      // When changing to solid-color, pause animation
       if (newPattern.id === 'solid-color') {
         setIsAnimationEnabled(false);
       }
@@ -67,14 +66,24 @@ export default function GlowMotionApp() {
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
       }
-      // When pausing, render one last static frame
-      const t = timeRef.current * (speed / 1000);
-      const newGridData = Array.from({ length: GRID_ROWS }, (_, i) =>
-        Array.from({ length: GRID_COLS }, (_, j) =>
-          patternFuncRef.current(j, i, t, GRID_COLS, GRID_ROWS, colors)
-        )
-      );
-      setGridData(newGridData);
+      // When pausing, render one last static frame if not solid-color
+      if (selectedPattern !== 'solid-color') {
+        const t = timeRef.current * (speed / 1000);
+        const newGridData = Array.from({ length: GRID_ROWS }, (_, i) =>
+          Array.from({ length: GRID_COLS }, (_, j) =>
+            patternFuncRef.current(j, i, t, GRID_COLS, GRID_ROWS, colors)
+          )
+        );
+        setGridData(newGridData);
+      } else {
+        // For solid color, just show the solid color
+        const newGridData = Array.from({ length: GRID_ROWS }, (_, i) =>
+          Array.from({ length: GRID_COLS }, (_, j) =>
+            patternFuncRef.current(j, i, 0, GRID_COLS, GRID_ROWS, colors)
+          )
+        );
+        setGridData(newGridData);
+      }
     }
 
     return () => {
@@ -82,7 +91,7 @@ export default function GlowMotionApp() {
         cancelAnimationFrame(animationFrameId.current);
       }
     };
-  }, [animate, isAnimationEnabled, speed, colors]);
+  }, [animate, isAnimationEnabled, speed, colors, selectedPattern]);
 
   const handleFullscreenChange = () => {
     if (!document.fullscreenElement) {
@@ -112,7 +121,7 @@ export default function GlowMotionApp() {
     }
   };
   
-  const handleScreenTap = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleScreenDoubleClick = (e: React.MouseEvent<HTMLDivElement>) => {
     // Prevent color change if the click is on the control panel
     if ((e.target as HTMLElement).closest('.fixed.bottom-0')) {
       return;
@@ -146,7 +155,7 @@ export default function GlowMotionApp() {
   }
 
   return (
-    <div ref={appContainerRef} className="h-screen w-screen bg-background" onClick={handleScreenTap}>
+    <div ref={appContainerRef} className="h-screen w-screen bg-background" onDoubleClick={handleScreenDoubleClick}>
       <LedGrid gridData={gridData} style={{ opacity: brightness }}/>
       <ControlPanel
         colors={colors}
