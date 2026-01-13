@@ -106,10 +106,44 @@ const gradient: PatternFunction = (x, y, t, cols, rows, colors) => {
     return rgbToHex(finalColor[0], finalColor[1], finalColor[2]);
 };
 
+const solidColor: PatternFunction = (x, y, t, cols, rows, colors) => {
+    return colors[0] || '#000000';
+};
+
+const christmasBlinkRandom: PatternFunction = (x, y, t, cols, rows, colors) => {
+    const ledIndex = y * cols + x;
+    const phase = t * 2;
+    const isOn = (phase + ledIndex) % (colors.length + 5) < colors.length;
+    if (isOn) {
+        const colorIndex = (ledIndex + Math.floor(phase)) % colors.length;
+        return colors[colorIndex];
+    }
+    return '#000000';
+};
+
+const christmasTwinkle: PatternFunction = (x, y, t, cols, rows, colors) => {
+    const ledIndex = y * cols + x;
+    const colorIndex = ledIndex % colors.length;
+    const baseColor = colors[colorIndex];
+    
+    const timeSegment = Math.floor(t * 4);
+    const randomSeed = (x * 13 + y * 29 + timeSegment * 41) % 100 / 100;
+
+    if (randomSeed > 0.8) {
+        return '#FFFFFF';
+    }
+    if (randomSeed > 0.6) {
+        return '#000000';
+    }
+    return baseColor;
+};
 
 export const patterns: { name: string; id: string; func: PatternFunction }[] = [
   { name: 'Plasma', id: 'plasma', func: plasma },
   { name: 'Rainbow Wave', id: 'rainbow-wave', func: rainbowWave },
   { name: 'Sparkle', id: 'sparkle', func: sparkle },
   { name: 'Gradient', id: 'gradient', func: gradient },
+  { name: 'Luzes de Natal', id: 'christmas-blink-random', func: christmasBlinkRandom },
+  { name: 'Pisca-Pisca Natal', id: 'christmas-twinkle', func: christmasTwinkle },
+  { name: 'Cor Sólida', id: 'solid-color', func: solidColor },
 ];

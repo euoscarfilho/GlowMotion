@@ -47,6 +47,8 @@ export default function ControlPanel({
     newColors[index] = newColor;
     setColors(newColors);
   };
+  
+  const isSolidColorMode = selectedPattern === 'solid-color';
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-10 flex h-auto w-full items-center justify-center p-4">
@@ -69,7 +71,7 @@ export default function ControlPanel({
         {/* Speed Slider Popover */}
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" size="icon" className="flex-shrink-0">
+            <Button variant="outline" size="icon" className="flex-shrink-0" disabled={isSolidColorMode}>
               <SlidersHorizontal className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
@@ -97,21 +99,35 @@ export default function ControlPanel({
           </PopoverTrigger>
           <PopoverContent className="w-auto">
             <div className="space-y-4">
-              <Label className="text-sm font-medium">Color Palette</Label>
+              <Label className="text-sm font-medium">{isSolidColorMode ? 'Escolha a Cor' : 'Paleta de Cores'}</Label>
               <div className="flex items-center gap-2">
-                {colors.map((color, index) => (
-                  <div key={index} className="relative h-8 w-8">
+                {isSolidColorMode ? (
+                  <div className="relative h-8 w-8">
                     <input
                       type="color"
-                      value={color}
-                      onChange={(e) => handleColorChange(index, e.target.value)}
+                      value={colors[0]}
+                      onChange={(e) => handleColorChange(0, e.target.value)}
                       className="absolute inset-0 h-full w-full cursor-pointer appearance-none border-none bg-transparent p-0 [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-md [&::-webkit-color-swatch]:border-none"
-                      aria-label={`Color ${index + 1}`}
+                      aria-label="Color 1"
                     />
                   </div>
-                ))}
+                ) : (
+                  <>
+                    {colors.map((color, index) => (
+                      <div key={index} className="relative h-8 w-8">
+                        <input
+                          type="color"
+                          value={color}
+                          onChange={(e) => handleColorChange(index, e.target.value)}
+                          className="absolute inset-0 h-full w-full cursor-pointer appearance-none border-none bg-transparent p-0 [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:rounded-md [&::-webkit-color-swatch]:border-none"
+                          aria-label={`Color ${index + 1}`}
+                        />
+                      </div>
+                    ))}
+                  </>
+                )}
               </div>
-              <AiPaletteSuggester onPaletteSuggested={setColors} />
+              {!isSolidColorMode && <AiPaletteSuggester onPaletteSuggested={setColors} />}
             </div>
           </PopoverContent>
         </Popover>
