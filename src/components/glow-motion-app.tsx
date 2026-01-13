@@ -5,8 +5,8 @@ import LedGrid from './led-grid';
 import ControlPanel from './control-panel';
 import { patterns, type PatternFunction } from '@/lib/patterns';
 
-const GRID_COLS = 96;
-const GRID_ROWS = 128;
+const GRID_COLS = 128;
+const GRID_ROWS = 96;
 
 const createInitialGrid = (): string[][] => {
   return Array(GRID_ROWS).fill(Array(GRID_COLS).fill('#000000'));
@@ -156,7 +156,7 @@ export default function GlowMotionApp() {
 
   return (
     <div ref={appContainerRef} className="h-screen w-screen bg-background" onDoubleClick={handleScreenDoubleClick}>
-      <LedGrid gridData={gridData} style={{ opacity: brightness }}/>
+      <LedGrid gridData={gridData} style={{ filter: `brightness(${brightness})` }}/>
       <ControlPanel
         colors={colors}
         setColors={setColors}

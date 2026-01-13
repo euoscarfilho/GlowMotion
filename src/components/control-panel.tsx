@@ -8,7 +8,6 @@ import {
   Play,
   Settings2,
   SlidersHorizontal,
-  Sun,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -107,8 +106,8 @@ export default function ControlPanel({
                 <Label htmlFor="brightness" className="text-sm font-medium">Brilho</Label>
                 <Slider
                   id="brightness"
-                  min={0}
-                  max={1}
+                  min={0.2}
+                  max={1.5}
                   step={0.05}
                   value={[brightness]}
                   onValueChange={(value) => setBrightness(value[0])}
